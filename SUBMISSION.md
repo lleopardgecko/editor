@@ -2,7 +2,7 @@
 
 ## Deliverables
 
-- [x] Source code (GitHub repo)
+- [x] Source code
 - [x] README.md
 - [x] ARCHITECTURE.md
 - [x] AI_WORKFLOW.md
@@ -12,12 +12,6 @@
 
 https://editor-rouge-ten.vercel.app
 
-## Test Credentials
-
-| User | Email | Password |
-|---|---|---|
-| Alice | | |
-| Bob | | |
 
 ## Features Working
 
@@ -39,6 +33,7 @@ https://editor-rouge-ten.vercel.app
 
 ## What Would Be Built Next (2–4 hours)
 
+- **UI design**
 - **.docx support** via `mammoth.js` — add a conversion layer that transforms .docx content into Tiptap-compatible JSON on upload
 - **Real-time collaboration** via Supabase Realtime — broadcast editor transactions to other connected clients on the same document
 - **Improved sharing UX** — permission levels (view vs. edit), revoke access, see who a document is shared with

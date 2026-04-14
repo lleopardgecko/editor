@@ -16,7 +16,7 @@
 3. **Sharing logic** — share by email, separate owned vs. shared views
 4. **Clean deployment** — live on Vercel with Supabase connected from day one
 
-## What Was Intentionally Cut
+## What Was Cut
 
 - **.docx import** — would require a `mammoth.js` conversion layer plus paste/drop handling; out of scope for the timebox
 - **Real-time multiplayer collaboration** — needs Supabase Realtime + conflict resolution; a separate project in scope
@@ -47,6 +47,6 @@ document_shares
 
 RLS policies ensure users can only read/write their own documents or documents explicitly shared with them.
 
-## Honest Tradeoff
+## Tradeoff
 
 File upload parses `.txt` and `.md` as plain text and inserts it into the editor as a paragraph block. This is fast and dependency-free, but it discards any markdown formatting rather than converting it to rich text nodes. Under more time, the content would be parsed through a markdown-to-Tiptap transformer.
