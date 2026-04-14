@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import ListItem from "@tiptap/extension-list-item";
 
 import { createClient } from "@/lib/supabase-browser";
 
@@ -29,7 +30,10 @@ export default function Editor({
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({ listItem: false }),
+      ListItem.extend({ content: "(paragraph | heading) block*" }),
+    ],
     content: initialContent,
     editorProps: {
       attributes: {
@@ -92,7 +96,7 @@ export default function Editor({
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <button onClick={() => router.push("/")} className="text-sm text-neutral-500 hover:text-neutral-900">
           &larr; Back
