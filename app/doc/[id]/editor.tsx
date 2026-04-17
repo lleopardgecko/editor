@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, type Editor as TiptapEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ListItem from "@tiptap/extension-list-item";
 
@@ -13,13 +13,11 @@ export default function Editor({
   initialTitle,
   initialContent,
   isOwner,
-  userId,
 }: {
   id: string;
   initialTitle: string;
   initialContent: string;
   isOwner: boolean;
-  userId: string;
 }) {
   const supabase = createClient();
   const router = useRouter();
@@ -28,7 +26,13 @@ export default function Editor({
   const [shareMsg, setShareMsg] = useState("");
   const [showShare, setShowShare] = useState(false);
   const [saving, setSaving] = useState(false);
-  const lastSaved = useRef<string>(initialContent);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const lastSavedContent = useRef<string>(initialContent);
+  const lastSavedTitle = useRef<string>(initialTitle);
+  const titleRef = useRef(title);
+  useEffect(() => {
+    titleRef.current = title;
+  }, [title]);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -47,33 +51,39 @@ export default function Editor({
   const save = useCallback(async () => {
     if (!editor) return;
     const html = editor.getHTML();
-    if (html === lastSaved.current) return;
-    setSaving(true);
-    lastSaved.current = html;
-    await supabase
-      .from("documents")
-      .update({ content: html, updated_at: new Date().toISOString() })
-      .eq("id", id)
-      .eq("owner_id", userId);
-    setSaving(false);
-  }, [editor, id, supabase, userId]);
+    const currentTitle = titleRef.current;
+    const contentChanged = html !== lastSavedContent.current;
+    const titleChanged = currentTitle !== lastSavedTitle.current;
+    if (!contentChanged && !titleChanged) return;
 
-  // Auto-save every 3 seconds
+    setSaving(true);
+    const patch: { content?: string; title?: string; updated_at: string } = {
+      updated_at: new Date().toISOString(),
+    };
+    if (contentChanged) patch.content = html;
+    if (titleChanged) patch.title = currentTitle;
+
+    const { error } = await supabase.from("documents").update(patch).eq("id", id);
+    setSaving(false);
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
+    if (contentChanged) lastSavedContent.current = html;
+    if (titleChanged) lastSavedTitle.current = currentTitle;
+    setSaveError(null);
+  }, [editor, id, supabase]);
+
   useEffect(() => {
     const interval = setInterval(save, 3000);
     return () => clearInterval(interval);
   }, [save]);
-
-  async function saveTitle() {
-    await supabase.from("documents").update({ title }).eq("id", id).eq("owner_id", userId);
-  }
 
   async function handleShare(e: React.FormEvent) {
     if (!isOwner) return;
     e.preventDefault();
     setShareMsg("");
 
-    // Look up profile by email
     const { data: profile } = await supabase
       .from("profiles")
       .select("id")
@@ -106,7 +116,11 @@ export default function Editor({
           &larr; Back
         </button>
         <div className="flex items-center gap-3">
-          {saving && <span className="text-xs text-neutral-400">Saving...</span>}
+          {saveError ? (
+            <span className="text-xs text-red-600">Save failed: {saveError}</span>
+          ) : saving ? (
+            <span className="text-xs text-neutral-400">Saving...</span>
+          ) : null}
           {isOwner && (
             <button
               onClick={() => setShowShare(!showShare)}
@@ -141,7 +155,6 @@ export default function Editor({
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        onBlur={saveTitle}
         className="w-full text-2xl font-semibold mb-4 border-none outline-none bg-transparent"
         placeholder="Document title"
       />
@@ -155,7 +168,7 @@ export default function Editor({
   );
 }
 
-function Toolbar({ editor }: { editor: any }) {
+function Toolbar({ editor }: { editor: TiptapEditor }) {
   const btn = (active: boolean) =>
     `px-2 py-1 rounded text-sm ${active ? "bg-neutral-900 text-white" : "hover:bg-neutral-100"}`;
 

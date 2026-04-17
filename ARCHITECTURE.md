@@ -34,15 +34,16 @@ documents
   id          uuid
   owner_id    uuid  (references profiles)
   title       text
-  content     jsonb (Tiptap JSON)
+  content     text  (Tiptap-serialized HTML)
   created_at  timestamptz
   updated_at  timestamptz
 
 document_shares
-  id           uuid
-  document_id  uuid  (references documents)
-  shared_with  uuid  (references profiles)
-  created_at   timestamptz
+  id                 uuid
+  document_id        uuid  (references documents)
+  shared_with_id     uuid  (references profiles)
+  shared_with_email  text  (denormalized for lookup/audit)
+  created_at         timestamptz
 ```
 
 RLS policies ensure users can only read/write their own documents or documents explicitly shared with them.

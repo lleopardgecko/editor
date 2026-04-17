@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { config } from "./middleware";
+import { config } from "./proxy";
 
 // Next.js wraps the matcher string as ^<pattern>$ against the full pathname.
 const pattern = new RegExp(`^${config.matcher[0]}$`);
 
-describe("middleware matcher", () => {
+describe("proxy matcher", () => {
   it("matches page routes", () => {
     expect(pattern.test("/")).toBe(true);
     expect(pattern.test("/login")).toBe(true);

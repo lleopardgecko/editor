@@ -20,6 +20,7 @@ export default function Dashboard({
   const supabase = createClient();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   async function createDoc() {
     setCreating(true);
@@ -36,8 +37,10 @@ export default function Dashboard({
   }
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const input = e.target;
+    const file = input.files?.[0];
     if (!file) return;
+    input.value = "";
     if (file.size > 5 * 1024 * 1024) {
       setError("File must be under 5 MB.");
       return;
@@ -56,8 +59,15 @@ export default function Dashboard({
     if (insertErr) setError(insertErr.message);
   }
 
-  async function deleteDoc(id: string) {
-    if (!confirm("Delete this document?")) return;
+  async function handleDeleteClick(id: string) {
+    if (confirmingId !== id) {
+      setConfirmingId(id);
+      setTimeout(() => {
+        setConfirmingId((cur) => (cur === id ? null : cur));
+      }, 3000);
+      return;
+    }
+    setConfirmingId(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     await supabase.from("documents").delete().eq("id", id).eq("owner_id", user.id);
@@ -123,10 +133,14 @@ export default function Dashboard({
                   </span>
                 </Link>
                 <button
-                  onClick={() => deleteDoc(doc.id)}
-                  className="ml-3 text-xs text-neutral-400 hover:text-red-600"
+                  onClick={() => handleDeleteClick(doc.id)}
+                  className={`ml-3 text-xs ${
+                    confirmingId === doc.id
+                      ? "text-red-600 font-medium"
+                      : "text-neutral-400 hover:text-red-600"
+                  }`}
                 >
-                  Delete
+                  {confirmingId === doc.id ? "Confirm?" : "Delete"}
                 </button>
               </li>
             ))}

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import Editor from "./editor";
 
@@ -19,9 +19,8 @@ export default async function DocPage({
     .eq("id", id)
     .single();
 
-  if (!doc) redirect("/");
+  if (!doc) notFound();
 
-  // Check access: owner or shared
   const isOwner = doc.owner_id === user.id;
   if (!isOwner) {
     const { data: share } = await supabase
@@ -30,7 +29,7 @@ export default async function DocPage({
       .eq("document_id", id)
       .eq("shared_with_id", user.id)
       .single();
-    if (!share) redirect("/");
+    if (!share) notFound();
   }
 
   return (
@@ -39,7 +38,6 @@ export default async function DocPage({
       initialTitle={doc.title}
       initialContent={doc.content ?? ""}
       isOwner={isOwner}
-      userId={user.id}
     />
   );
 }

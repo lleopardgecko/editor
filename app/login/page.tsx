@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
+// NEXT_PUBLIC_* values are inlined at build time; demo buttons only render
+// when the env var is set at build.
 const demoAccounts =
   process.env.NEXT_PUBLIC_ENABLE_DEMO === "true"
     ? [
@@ -18,50 +20,42 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
 
   async function signIn(e_mail: string, pw: string) {
     setError("");
+    setInfo("");
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: e_mail, password: pw });
     if (error) {
-      // Auto-create demo accounts on first use
-      if (error.message === "Invalid login credentials") {
-        const { error: signUpErr } = await supabase.auth.signUp({ email: e_mail, password: pw });
-        if (signUpErr) {
-          setError(signUpErr.message);
-          setLoading(false);
-          return;
-        }
-        // Sign in after creating
-        const { error: retryErr } = await supabase.auth.signInWithPassword({ email: e_mail, password: pw });
-        if (retryErr) {
-          setError(retryErr.message);
-          setLoading(false);
-          return;
-        }
-      } else {
-        setError(error.message);
-        setLoading(false);
-        return;
-      }
+      setError(error.message);
+      setLoading(false);
+      return;
     }
     router.push("/");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+    setInfo("");
     setLoading(true);
 
     if (mode === "login") {
       return signIn(email, password);
     }
 
-    setError("");
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (!data.session) {
+      setInfo("Check your email to confirm your account, then sign in.");
       setLoading(false);
       return;
     }
@@ -113,6 +107,7 @@ export default function LoginPage() {
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
+          {info && <p className="text-sm text-neutral-700">{info}</p>}
 
           <button
             type="submit"
@@ -129,6 +124,7 @@ export default function LoginPage() {
             onClick={() => {
               setMode(mode === "login" ? "signup" : "login");
               setError("");
+              setInfo("");
             }}
             className="underline text-neutral-900"
           >
