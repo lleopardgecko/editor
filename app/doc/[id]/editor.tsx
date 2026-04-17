@@ -13,11 +13,13 @@ export default function Editor({
   initialTitle,
   initialContent,
   isOwner,
+  userId,
 }: {
   id: string;
   initialTitle: string;
   initialContent: string;
   isOwner: boolean;
+  userId: string;
 }) {
   const supabase = createClient();
   const router = useRouter();
@@ -51,9 +53,10 @@ export default function Editor({
     await supabase
       .from("documents")
       .update({ content: html, updated_at: new Date().toISOString() })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("owner_id", userId);
     setSaving(false);
-  }, [editor, id, supabase]);
+  }, [editor, id, supabase, userId]);
 
   // Auto-save every 3 seconds
   useEffect(() => {
@@ -62,10 +65,11 @@ export default function Editor({
   }, [save]);
 
   async function saveTitle() {
-    await supabase.from("documents").update({ title }).eq("id", id);
+    await supabase.from("documents").update({ title }).eq("id", id).eq("owner_id", userId);
   }
 
   async function handleShare(e: React.FormEvent) {
+    if (!isOwner) return;
     e.preventDefault();
     setShareMsg("");
 

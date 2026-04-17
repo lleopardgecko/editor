@@ -38,6 +38,10 @@ export default function Dashboard({
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File must be under 5 MB.");
+      return;
+    }
     setError(null);
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     if (!user) { setError(authErr?.message ?? "Not authenticated"); return; }
@@ -54,7 +58,9 @@ export default function Dashboard({
 
   async function deleteDoc(id: string) {
     if (!confirm("Delete this document?")) return;
-    await supabase.from("documents").delete().eq("id", id);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("documents").delete().eq("id", id).eq("owner_id", user.id);
     router.refresh();
   }
 

@@ -39,6 +39,7 @@ export default async function DocPage({
       initialTitle={doc.title}
       initialContent={doc.content ?? ""}
       isOwner={isOwner}
+      userId={user.id}
     />
   );
 }

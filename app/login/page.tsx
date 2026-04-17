@@ -4,6 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
+const demoAccounts =
+  process.env.NEXT_PUBLIC_ENABLE_DEMO === "true"
+    ? [
+        { name: "Alice", email: "alice@demo.com", password: "password123" },
+        { name: "Bob", email: "bob@demo.com", password: "password123" },
+      ]
+    : [];
+
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -12,11 +20,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
-
-  const demoAccounts = [
-    { name: "Alice", email: "alice@demo.com", password: "password123" },
-    { name: "Bob", email: "bob@demo.com", password: "password123" },
-  ];
 
   async function signIn(e_mail: string, pw: string) {
     setError("");
@@ -133,21 +136,23 @@ export default function LoginPage() {
           </button>
         </p>
 
-        <div className="border-t border-neutral-200 pt-5">
-          <p className="text-xs text-neutral-400 mb-3">Demo accounts</p>
-          <div className="flex gap-2">
-            {demoAccounts.map((acct) => (
-              <button
-                key={acct.email}
-                onClick={() => signIn(acct.email, acct.password)}
-                disabled={loading}
-                className="flex-1 rounded-md border border-neutral-200 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
-              >
-                {acct.name}
-              </button>
-            ))}
+        {demoAccounts.length > 0 && (
+          <div className="border-t border-neutral-200 pt-5">
+            <p className="text-xs text-neutral-400 mb-3">Demo accounts</p>
+            <div className="flex gap-2">
+              {demoAccounts.map((acct) => (
+                <button
+                  key={acct.email}
+                  onClick={() => signIn(acct.email, acct.password)}
+                  disabled={loading}
+                  className="flex-1 rounded-md border border-neutral-200 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+                >
+                  {acct.name}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
