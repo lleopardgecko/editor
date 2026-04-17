@@ -81,13 +81,13 @@ export default function Dashboard({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-2 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold">Documents</h1>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-neutral-500">{userEmail}</span>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-sm text-neutral-500 truncate">{userEmail}</span>
           <button
             onClick={signOut}
-            className="text-sm text-neutral-500 underline hover:text-neutral-900"
+            className="text-sm text-neutral-500 underline hover:text-neutral-900 shrink-0"
           >
             Sign out
           </button>
@@ -122,19 +122,19 @@ export default function Dashboard({
         ) : (
           <ul className="divide-y divide-neutral-100">
             {ownedDocs.map((doc) => (
-              <li key={doc.id} className="flex items-center justify-between py-3 hover:bg-neutral-50 -mx-2 px-2 rounded">
+              <li key={doc.id} className="flex items-center gap-3 py-3 hover:bg-neutral-50 -mx-2 px-2 rounded">
                 <Link
                   href={`/doc/${doc.id}`}
-                  className="flex-1 flex items-center justify-between"
+                  className="flex-1 min-w-0 flex items-center justify-between gap-3"
                 >
-                  <span className="text-sm font-medium">{doc.title}</span>
-                  <span className="text-xs text-neutral-400">
+                  <span className="text-sm font-medium truncate">{doc.title}</span>
+                  <span className="text-xs text-neutral-400 shrink-0">
                     {doc.updated_at}
                   </span>
                 </Link>
                 <button
                   onClick={() => handleDeleteClick(doc.id)}
-                  className={`ml-3 text-xs ${
+                  className={`text-xs shrink-0 ${
                     confirmingId === doc.id
                       ? "text-red-600 font-medium"
                       : "text-neutral-400 hover:text-red-600"
@@ -158,10 +158,10 @@ export default function Dashboard({
               <li key={doc.id}>
                 <Link
                   href={`/doc/${doc.id}`}
-                  className="flex items-center justify-between py-3 hover:bg-neutral-50 -mx-2 px-2 rounded"
+                  className="flex items-center justify-between gap-3 py-3 hover:bg-neutral-50 -mx-2 px-2 rounded"
                 >
-                  <span className="text-sm font-medium">{doc.title}</span>
-                  <span className="text-xs text-neutral-400">
+                  <span className="text-sm font-medium truncate">{doc.title}</span>
+                  <span className="text-xs text-neutral-400 shrink-0">
                     {doc.updated_at}
                   </span>
                 </Link>

@@ -111,20 +111,20 @@ export default function Editor({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <button onClick={() => router.push("/")} className="text-sm text-neutral-500 hover:text-neutral-900">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <button onClick={() => router.push("/")} className="text-sm text-neutral-500 hover:text-neutral-900 shrink-0">
           &larr; Back
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           {saveError ? (
-            <span className="text-xs text-red-600">Save failed: {saveError}</span>
+            <span className="text-xs text-red-600 truncate">Save failed: {saveError}</span>
           ) : saving ? (
             <span className="text-xs text-neutral-400">Saving...</span>
           ) : null}
           {isOwner && (
             <button
               onClick={() => setShowShare(!showShare)}
-              className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50"
+              className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50 shrink-0"
             >
               Share
             </button>
@@ -133,22 +133,22 @@ export default function Editor({
       </div>
 
       {showShare && (
-        <form onSubmit={handleShare} className="mb-6 flex gap-2 items-start">
+        <form onSubmit={handleShare} className="mb-6 flex flex-wrap gap-2 items-start">
           <input
             type="email"
             placeholder="Email to share with"
             value={shareEmail}
             onChange={(e) => setShareEmail(e.target.value)}
             required
-            className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+            className="flex-1 min-w-0 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
           />
           <button
             type="submit"
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 shrink-0"
           >
             Share
           </button>
-          {shareMsg && <span className="text-sm text-neutral-500 self-center">{shareMsg}</span>}
+          {shareMsg && <span className="text-sm text-neutral-500 self-center basis-full">{shareMsg}</span>}
         </form>
       )}
 

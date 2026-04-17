@@ -151,3 +151,21 @@ middleware.ts         → proxy.ts       (rename + edit)
 package.json
 package-lock.json     (from npm install)
 ```
+
+---
+
+## Follow-up: narrow-viewport layout fix
+
+**Files:** `app/dashboard.tsx`, `app/doc/[id]/editor.tsx`
+
+After deploying the changes above, a screenshot surfaced showing the dashboard header overlapping — "Documents" heading butting up against the user's email, and document-row dates/buttons getting shoved around. Confirmed via the compiled CSS (`/_next/static/chunks/...css`) that Tailwind preflight was applied correctly and `text-2xl` resolved to 1.5rem — font sizes were fine. The real issue: `flex items-center justify-between` with no wrapping or truncation meant items simply collided on narrow viewports (the screenshot was a half-width browser window).
+
+Changes:
+
+- **Dashboard header row** — stacks vertically by default, switches to `flex-row sm:justify-between` at ≥640px. Email gets `truncate`, sign-out gets `shrink-0` so it never wraps off-screen.
+- **Owned-document rows** — title wrapped in `min-w-0 truncate` so long titles ellipsize instead of pushing the date and delete button out. Date + delete are `shrink-0` with consistent `gap-3` spacing.
+- **Shared-document rows** — same truncation + shrink treatment applied.
+- **Editor header** — swapped to `flex-wrap` with `gap-3` so Back / Save status / Share button reflow onto a second row on narrow viewports instead of colliding.
+- **Share form** — wraps when narrow; the `shareMsg` feedback gets `basis-full` so it drops to its own row rather than squeezing between the input and the button.
+
+Wide-desktop layout is unchanged. `npm run lint` and `npx tsc --noEmit` remained clean after the changes.
