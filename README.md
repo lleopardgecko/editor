@@ -1,10 +1,12 @@
-# Ajaia Docs
+# Docs
+
+Completed in a 4-hour timebox; document sharing is enforced via Supabase row-level security at the database layer, not the application layer.
 
 A lightweight collaborative document editor built as a take-home project. Users can create and edit rich-text documents, upload plain-text files, and share individual documents with other users by email. All data is persisted in Supabase with row-level security enforced at the database layer.
 
 ## Live Demo
 
-[LIVE_URL]
+https://editor-rouge-ten.vercel.app
 
 Demo accounts are available directly on the login page — click **Alice** or **Bob** to sign in instantly. Use both to test the sharing flow.
 
@@ -12,7 +14,7 @@ Demo accounts are available directly on the login page — click **Alice** or **
 
 ```bash
 git clone <repo-url>
-cd ajaia-docs
+cd editor
 npm install
 ```
 
